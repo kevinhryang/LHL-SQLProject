@@ -9,6 +9,7 @@ all_sessions
 - date is given as a number
 - product refund amount is empty
 - product price is either 0 or huge
+- product quantity has many null values
 - item quantity is empty, redundant with product quantity
 - item revenue is empty, redundant with product revenue
 - transaction revenue is either null or huge
@@ -20,16 +21,18 @@ analytics
 - user id is empty, redundant with visitor id
 - social engagement type has only one value, not socially engaged
 - bounces is either null, 1, or 2
-- lots of near duplicates. all fields the same except for unit price
+- unit price is either 0 or huge
+- lots of near duplicates. most differ by only unit price, but some have other differences as well
 
 products
-- 
+- one product has null values, in sentiment score and magnitude
 
 sales by sku
-- Sales by sku has 8 more rows than sales report
+- sales by sku is included in sales report, save for 8 entries
 
 sales report
-
+- many redundant attributes with products: name, stock, restock lead time, sentiment score, sentiment magnitude
+- ratio is total ordered / stock, redundant if all 3 are included
 
 
 Queries:
@@ -67,6 +70,10 @@ ALTER COLUMN prod_price TYPE decimal;
 UPDATE all_sessions
 SET prod_price = prod_price / 1000000
 WHERE prod_price IS NOT NULL;
+
+UPDATE all_sessions
+SET prod_quant = 0
+WHERE prod_quant IS NULL;
 
 ALTER TABLE all_sessions
 DROP COLUMN item_quant;
@@ -117,16 +124,40 @@ UPDATE analytics
 SET bounces = 0
 WHERE bounces IS NULL
 
------------------ left off here, need to deal with analytics duplicates
+ALTER TABLE analytics
+ALTER COLUMN unit_price TYPE decimal;
 
+UPDATE analytics
+SET unit_price = unit_price / 1000000;
+
+INSERT INTO analytics_array
+SELECT visit_num, visit_id, visit_start_time, 
+visitor_id, channel, units_sold, 
+page_views, time_site, bounces, 
+revenue, ARRAY_AGG(unit_price) as unit_prices, date
+FROM analytics 
+GROUP BY visit_num, visit_id, visit_start_time, 
+visitor_id, channel, units_sold, 
+page_views, time_site, bounces, 
+revenue, date;
+
+DROP TABLE analytics;
+
+-- products
+
+DELETE FROM products WHERE NOT (products IS NOT NULL)
 
 -- sales_by_sku
 
-DELETE FROM sales_by_sku
-WHERE sku IN (
-	SELECT ss.sku FROM sales_by_sku ss 
-	LEFT JOIN sales_report sr 
-	ON ss.sku = sr.sku 
-	WHERE sr.sku IS NULL
-);
+DROP TABLE sales_by_sku;
 
+-- sales_report
+
+ALTER TABLE sales_report
+DROP COLUMN name,
+DROP COLUMN stock,
+DROP COLUMN restock_time;
+
+ALTER TABLE products
+DROP COLUMN sent_score,
+DROP COLUMN sent_mag;
