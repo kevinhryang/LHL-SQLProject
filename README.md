@@ -29,5 +29,6 @@ As well, there were a few attributes that were difficult to impute. Filling in a
 
 ## Future Goals
 - split all_sessions into multiple tables, possibly consolidating information from other tables to get rid of unnecessary entries
-- link the tables together in order to show relationships in the ERD
+- figure out how to do one to one ERD relationships in pgadmin
+- fix lingering consistency issues between foreign/primary key data types
 - come up with a system for imputing the remaining null values in the database
