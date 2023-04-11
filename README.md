@@ -23,7 +23,7 @@ All visits to the website are recorded, tracking visitors, what page they viewed
 ## Challenges 
 On the technical side, pgAdmin crashed. A lot. Also, analytics.csv was a huge file that couldn't be viewed easily. One way to make sense of it was to pull out the first 100 lines or so. Another way was to use bash commands to view specific columns that seemed almost empty.
 
-> cat analytics.csv | cut -d ',' -f13
+> cat analytics.csv | cut -d ',' -f13 > column.txt
 
 As well, there were a few attributes that were difficult to impute. Filling in a value could be misleading, and so NULL seemed to be a fine stand in until more domain knowledge was acquired.
 
@@ -32,3 +32,4 @@ As well, there were a few attributes that were difficult to impute. Filling in a
 - figure out how to do one to one ERD relationships in pgadmin
 - fix lingering consistency issues between foreign/primary key data types
 - come up with a system for imputing the remaining null values in the database
+- handle outliers throughout the database

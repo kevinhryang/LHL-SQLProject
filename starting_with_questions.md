@@ -44,7 +44,7 @@ ORDER BY avg_prod_quant DESC
 Answer:
 
 Many nest-usa in the US
-Apparel of all kinds across the board
+Apparel of all kinds across the board, for example Madrid ordered many socks.
 
 
 **Question 4: What is the top-selling product from each city/country? Can we find any pattern worthy of noting in the products sold?**
